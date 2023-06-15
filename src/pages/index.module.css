@@ -1,3 +1,9 @@
+.hoge {
+  width: 30px;
+  height: 30px;
+  background: url('../../assets/images/icons.png') no-repeat;
+}
+
 .container {
   display: flex;
   flex-direction: column;
