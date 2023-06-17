@@ -1,7 +1,23 @@
-.hoge {
-  width: 30px;
-  height: 30px;
-  background: url('../../assets/images/icons.png') no-repeat;
+.board {
+  background-color: #dcdcdc;
+  width: 720px;
+  height: 720px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  border-top: 10px solid #f5f5f5;
+  border-left: 10px solid #f5f5f5;
+  border-bottom: 10px solid #c0c0c0;
+  border-right: 10px solid #c0c0c0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
