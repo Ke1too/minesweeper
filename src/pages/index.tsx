@@ -40,6 +40,8 @@ const Home = () => {
   // 9 -> 石＋はてな
   // 10 -> 石＋旗
   // 11 -> ボムセル
+  // 12 -> クリックしたところがボムだった場合、そこの背景を赤にする
+
   const board: number[][] = [
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -62,25 +64,54 @@ const Home = () => {
     [1, 0],
     [1, -1],
   ];
-  const bombCount = 10;
 
+  // ボム設置、10個置いたら終了する
   const clickLeft = (x: number, y: number) => {
     console.log(x, y);
-    const newbombMap: number[][] = JSON.parse(JSON.stringify(board));
+    if (!bombMap.flat().includes(1)) {
+      const newBombMap: number[][] = JSON.parse(JSON.stringify(bombMap));
+      let bomb = 0;
+      while (bomb < 10) {
+        const s = Math.floor(Math.random() * 9);
+        const t = Math.floor(Math.random() * 9);
 
-    let bomb = 0;
-    while (bomb < 10) {
-      const s = Math.floor(Math.random() * 9);
-      const t = Math.floor(Math.random() * 9);
+        if (!newBombMap[s][t]) {
+          console.log('🤩');
+          newBombMap[s][t] = 1;
+          bomb += 1;
+        }
+      }
 
-      if (!newbombMap[s][t]) {
-        console.log(bomb);
-        newbombMap[s][t] = 1;
-        bomb += 1;
+      setbombMap(newBombMap);
+    }
+  };
+
+  //再帰関数、クリックした周り８方向にあるボムの把握
+  const Checkaround = (x: number, y: number) => {
+    let bombCount = 0;
+    for (const [y2, x2] of directions) {
+      if (
+        bombMap[y + y2] !== undefined &&
+        bombMap[y + y2][x + x2] !== undefined &&
+        bombMap[y + y2][x + x2] === 1
+      ) {
+        bombCount++;
       }
     }
-
-    setbombMap(newbombMap);
+    board[y][x] = bombCount;
+    if (bombCount === 0) {
+      for (const [y2, x2] of directions) {
+        if (
+          board[y + y2] !== undefined &&
+          board[y + y2][x + x2] !== undefined &&
+          (board[y + y2][x + x2] === -1 ||
+            board[y + y2][x + x2] === 9 ||
+            board[y + y2][x + x2] === 10)
+        ) {
+          Checkaround(x + x2, y + y2);
+        }
+      }
+    }
   };
 
   return (
@@ -88,7 +119,16 @@ const Home = () => {
       <div className={styles.board}>
         {board.map((row, y) =>
           row.map((color, x) => (
-            <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickLeft(x, y)} />
+            <div
+              className={styles.cell}
+              key={`${x}-${y}`}
+              onClick={() => clickLeft(x, y)}
+              style={{ backgroundPositionX: 80 + -80 * color }}
+            >
+              {(color === -1 || color === 9 || color === 10) && (
+                <div className={styles.stone} style={{ backgroundPositionX: 60 + -60 * color }} />
+              )}
+            </div>
           ))
         )}
       </div>
