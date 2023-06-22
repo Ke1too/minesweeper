@@ -43,8 +43,8 @@ const Home = () => {
   // 12 -> クリックしたところがボムだった場合、そこの背景を赤にする
 
   const board: number[][] = [
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -0, 1, 2, 3, 4, 5, 6, 7],
+    [8, 9, 10, 11, 12, 13, 14, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -66,7 +66,7 @@ const Home = () => {
   ];
 
   // ボム設置、10個置いたら終了する
-  const clickLeft = (x: number, y: number) => {
+  const LeftClick = (x: number, y: number) => {
     console.log(x, y);
     if (!bombMap.flat().includes(1)) {
       const newBombMap: number[][] = JSON.parse(JSON.stringify(bombMap));
@@ -87,7 +87,7 @@ const Home = () => {
   };
 
   //再帰関数、クリックした周り８方向にあるボムの把握
-  const Checkaround = (x: number, y: number) => {
+  const checkAround = (x: number, y: number) => {
     let bombCount = 0;
     for (const [y2, x2] of directions) {
       if (
@@ -104,15 +104,44 @@ const Home = () => {
         if (
           board[y + y2] !== undefined &&
           board[y + y2][x + x2] !== undefined &&
-          (board[y + y2][x + x2] === -1 ||
-            board[y + y2][x + x2] === 9 ||
-            board[y + y2][x + x2] === 10)
+          board[y + y2][x + x2] === -1
         ) {
-          Checkaround(x + x2, y + y2);
+          checkAround(x + x2, y + y2);
         }
       }
     }
   };
+
+  for (let x = 0; x < 9; x++) {
+    for (let y = 0; y < 9; y++) {
+      if (userInputs[x][y] === 1) {
+        if (bombMap[y][x] === 1) {
+          // 爆破
+        } else if (bombMap[y][x] === 0) {
+          let bombCount = 0;
+          for (const [y3, x3] of directions) {
+            if (
+              bombMap[y + y3] !== undefined &&
+              bombMap[y + y3][x + x3] !== undefined &&
+              bombMap[y + y3][x + x3] === 1
+            ) {
+              bombCount++;
+              board[y][x] = bombCount;
+            }
+          }
+        } else if (bombMap[y][x] === 0) {
+          for (const [y3, x3] of directions) {
+            if (
+              bombMap[y + y3] !== undefined &&
+              bombMap[y + y3][x + x3] !== undefined &&
+              bombMap[y + y3][x + x3] === 0
+            ) {
+              //再帰関数
+            }
+        }
+      }
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -122,7 +151,7 @@ const Home = () => {
             <div
               className={styles.cell}
               key={`${x}-${y}`}
-              onClick={() => clickLeft(x, y)}
+              onClick={() => LeftClick(x, y)}
               style={{ backgroundPositionX: 80 + -80 * color }}
             >
               {(color === -1 || color === 9 || color === 10) && (
